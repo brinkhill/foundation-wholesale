@@ -1,0 +1,254 @@
+{%- comment %}<locksmith:e11f>{% endcomment -%}
+  {%- include 'locksmith' -%}
+{%- comment %}</locksmith:e11f>{% endcomment -%}
+
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+<head>
+{{ locksmith_initializations }}
+{%- include 'swift-optimize-master' -%}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_button }}">
+  
+  <link rel="canonical" href="{{ canonical_url }}">
+				
+  {%- if settings.favicon -%}
+    <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" type="image/png" />
+
+  {%- endif -%}
+
+  {% include 'seo-title' %}
+  <title>{{ seo_title }}</title>
+
+  {%- if page_description -%}
+  {%- comment %}<locksmith:c5fa>{% endcomment -%}
+    {%- capture var %}{% render 'locksmith-variables', variable: 'transparent', hiding_scope: 'resource' %}{% endcapture %}{% if var == 'true' %}<meta name="description" content="{{ page_description | escape }}">{% endif -%}
+    {%- comment %}original: <meta name="description" content="{{ page_description | escape }}">{%- endcomment %}
+  {%- comment %}</locksmith:c5fa>{% endcomment -%}
+  {%- endif -%}
+
+  {% include 'social-meta-tags' %}
+
+  {% include 'font-face' %}
+  {{ 'theme.scss.css' | asset_url | stylesheet_tag }}
+ 
+  
+  {% style %}
+    .collection-item__title {
+      font-size: {{ settings.type_collection_size | times: 0.8 }}px;
+    }
+
+    @media screen and (min-width: 769px) {
+      .collection-item__title {
+        font-size: {{ settings.type_collection_size }}px;
+      }
+    }
+  {% endstyle %}
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+
+    window.theme = window.theme || {};
+    theme.routes = {
+      cart: "{{ routes.cart_url }}",
+      cartAdd: "{{ routes.cart_add_url }}",
+      cartChange: "{{ routes.cart_change_url }}"
+    };
+    theme.strings = {
+      addToCart: {{ 'products.product.add_to_cart' | t | json }},
+      soldOut: {{ 'products.product.sold_out' | t | json }},
+      unavailable: {{ 'products.product.unavailable' | t | json }},
+      stockLabel: {{ 'products.product.stock_label' | t: count: '[count]' | json }},
+      willNotShipUntil: {{ 'products.product.will_not_ship_until' | t: date: '[date]' | json }},
+      willBeInStockAfter: {{ 'products.product.will_be_in_stock_after' | t: date: '[date]' | json }},
+      waitingForStock: {{ 'products.product.waiting_for_stock' | t | json }},
+      savePrice: {{ 'products.general.save_html' | t: saved_amount: '[saved_amount]' | json }},
+      cartEmpty: {{ 'cart.general.empty' | t | json }},
+      cartTermsConfirmation: {{ 'cart.general.terms_confirm' | t | json }}
+    };
+    theme.settings = {
+      dynamicVariantsEnable: true,
+      dynamicVariantType: {{ settings.variant_type | json }},
+      cartType: {{ settings.cart_type | json }},
+      moneyFormat: {{ shop.money_format | json }},
+      saveType: {{ settings.product_save_type | json }},
+      recentlyViewedEnabled: false,
+      predictiveSearch: {{ settings.predictive_search_enabled }},
+      predictiveSearchType: {{ settings.search_type | json }},
+      inventoryThreshold: {{ settings.inventory_threshold }},
+      quickView: {{ settings.quick_shop_enable }},
+      themeName: 'Impulse',
+      themeVersion: "3.1.0"
+    };
+  </script>
+
+  {{ content_for_header }}
+
+  
+
+  {% if shop.enabled_currencies.size > 1 %}
+    <link rel="preload" as="style" href="{{ 'currency-flags.css' | asset_url }}" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ 'currency-flags.css' | asset_url }}"></noscript>
+  {% endif %}
+
+  <script src="{{ 'theme.js' | asset_url }}" defer ></script>
+
+  {%- if request.page_type contains 'customers/' -%}
+    <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer ></script>
+  {%- endif -%}
+
+
+  
+{% render 'minmaxify-head' %}
+{% include 'swift_core' %} 
+ 
+{% include 'swift_preload_font' with settings.type_header_family %}
+{% include 'swift_preload_font' with settings.type_base_family %}
+ 
+{% if template.name == "product" %}
+  {{ 'lazysizes.min.js' | asset_url | script_tag }}
+{% endif %}
+ <script async src="{{ 'vendor-scripts-v6.js' | asset_url | split: '?' | first }}" ></script>
+ </head>
+
+<body class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}" data-transitions="false">
+
+  <a class="in-page-link visually-hidden skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+  <div id="PageContainer" class="page-container">
+    <div class="transition-body">
+
+    {% section 'header' %}
+
+      <main class="main-content" id="MainContent">
+        {{ content_for_layout }} 
+ 
+  {% include 'stockify' %}
+      </main>
+
+      {% section 'footer-promotions' %}
+      {% section 'footer' %}
+
+    </div>
+  </div>
+
+  {% section 'newsletter-popup' %}
+
+  {%- if settings.cart_type == 'drawer' -%}
+    {%- include 'ajax-cart-template' -%}
+  {%- endif -%}
+
+  {% comment %}
+    Custom markup for slider arrows using theme icons
+  {% endcomment %}
+  <div class="hide">
+    <button id="prevArrowTemplate" class="slick-prev" aria-label="{{ 'general.pagination.previous' | t }}" type="button">
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-left" viewBox="0 0 284.49 498.98"><path d="M249.49 0a35 35 0 0 1 24.75 59.75L84.49 249.49l189.75 189.74a35.002 35.002 0 1 1-49.5 49.5L10.25 274.24a35 35 0 0 1 0-49.5L224.74 10.25A34.89 34.89 0 0 1 249.49 0z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.previous' | t }}</span>
+    </button>
+    <button id="nextArrowTemplate" class="slick-next" aria-label="{{ 'general.pagination.next' | t }}" type="button">
+      <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-chevron-right" viewBox="0 0 284.49 498.98"><path d="M35 498.98a35 35 0 0 1-24.75-59.75l189.74-189.74L10.25 59.75a35.002 35.002 0 0 1 49.5-49.5l214.49 214.49a35 35 0 0 1 0 49.5L59.75 488.73A34.89 34.89 0 0 1 35 498.98z"/></svg>
+      <span class="icon__fallback-text">{{ 'general.pagination.next' | t }}</span>
+    </button>
+  </div>
+
+  {%- if settings.predictive_search_enabled -%}
+    {%- include 'predictive-template' -%}
+  {%- endif -%}
+
+  {% include 'video-modal' %}
+  {% include 'photoswipe-template' %}
+  {% if template contains 'product' %}
+    {% include 'recently-viewed-product-template' %}
+  {% endif %}
+ {% include 'smile-initializer' %}
+
+	{% if content_for_header contains 'upsell-now.herokuapp.com' %}{% render 'upsell-now', customer: customer, product: product, template: template, cart: cart %}{% endif %}
+	{% render 'preorder-now' %}
+ <script>
+	function loadResources () {
+		let e = document.getElementsByTagName("link");
+		if (e.length > 0)
+			for (let t = 0; t < e.length; ++t) {
+				let a = e[t].getAttribute("lazy-href");
+				a && e[t].setAttribute("href", a)
+			}
+		let t = document.getElementsByTagName("iframe");
+		if (t.length > 0)
+			for (let e = 0; e < t.length; ++e) {
+				let a = t[e].getAttribute("lazy-src");
+				a && t[e].setAttribute("src", a)
+			}
+		let a = document.getElementsByTagName("video");
+		if (a.length > 0)
+			for (let e = 0; e < a.length; ++e) {
+				let t = a[e].getAttribute("lazy-src");
+				t && a[e].setAttribute("src", t)
+			}
+		let o = document.getElementsByTagName("script");
+		if (o.length > 0)
+			for (let e = 0; e < o.length; ++e) {
+				let t = o[e].getAttribute("lazy-src");
+				t && o[e].setAttribute("src", t)
+			}
+	}
+
+	function elementInViewport (e) {
+		for (var t = e.offsetTop, a = e.offsetLeft, o = e.offsetWidth, n = e.offsetHeight; e.offsetParent;) t += (e = e.offsetParent).offsetTop, a += e.offsetLeft;
+		return t < window.pageYOffset + window.innerHeight && a < window.pageXOffset + window.innerWidth && t + n > window.pageYOffset && a + o > window.pageXOffset
+	}
+
+	function lazyLoadImage () {
+		let e = document.getElementsByTagName("img");
+		if (e.length > 0)
+			for (let t = 0; t < e.length; ++t) {
+				let a = e[t].getAttribute("lazy-src");
+				a && e[t].setAttribute("src", a)
+			}
+		let t = document.getElementsByClassName("__bg");
+		if (t.length > 0)
+			for (let e = 0; e < t.length; ++e) {
+				let a = t[e].getAttribute("lazy-bg");
+				a && (t[e].style.backgroundImage = "url(" + a + ")", t[e].style.backgroundPosition = "center", t[e].style.backgroundSize = "cover")
+			}
+	}
+
+	function LoadImagesInit () {
+		let e = document.getElementsByTagName("img");
+		if (e.length > 0)
+			for (let t = 0; t < e.length; ++t)
+				if (1 == elementInViewport(e[t])) {
+					let a = e[t].getAttribute("lazy-src");
+					a && e[t].setAttribute("src", a)
+				}
+	}
+	LoadImagesInit(), document.addEventListener("click", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("scroll", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("mouseover", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("keydown", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("touchmove", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("touchstart", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	}), document.addEventListener("wheel", function () {
+		null == document.getElementsByTagName("body")[0].getAttribute("lazyLoaded") ? (loadResources(), lazyLoadImage(), document.getElementsByTagName("body")[0].setAttribute("lazyLoaded", "1")) : lazyLoadImage()
+	});
+
+</script>
+  
+<!-- subify Snippet Start -->
+{% if content_for_header contains 'https:\/\/static.shopgram.io\/subify-sdk.js' %} 
+
+                {% render 'subify-snippet' %}
+        
+{% endif %}
+<!-- subify Snippet End -->
+
+</body>
+</html>

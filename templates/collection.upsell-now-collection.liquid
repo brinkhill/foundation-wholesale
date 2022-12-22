@@ -1,0 +1,53 @@
+{% layout none %}
+{% if collection %}
+[
+{%- comment %}<locksmith:eee4>{% endcomment -%}
+  {%- assign locksmith_596f_forloop__size = 0 %}{% for product in collection.products %}{% capture var %}{% render 'locksmith-variables', scope: 'subject', subject: product, subject_parent: collection, variable: 'transparent' %}{% endcapture %}{% if var == 'true' %}{% assign locksmith_596f_forloop__size = locksmith_596f_forloop__size | plus: 1 %}{% endif %}{% endfor %}{% assign locksmith_596f_forloop__index = nil -%}
+{%- comment %}</locksmith:eee4>{% endcomment -%}
+{% for product in collection.products %}
+{%- comment %}<locksmith:bfd8>{% endcomment -%}
+  {%- capture var %}{% render 'locksmith-variables', scope: 'subject', subject: product, subject_parent: collection, variable: 'transparent' %}{% endcapture %}{% if var == "true" %}{% if locksmith_596f_forloop__index == nil %}{% assign locksmith_596f_forloop__index = 1 %}{% assign locksmith_596f_forloop__index0 = 0 %}{% else %}{% assign locksmith_596f_forloop__index = locksmith_596f_forloop__index | plus: 1 %}{% assign locksmith_596f_forloop__index0 = locksmith_596f_forloop__index0 | plus: 1 %}{% endif %}{% if locksmith_596f_forloop__index == 1 %}{% assign locksmith_596f_forloop__first = true %}{% else %}{% assign locksmith_596f_forloop__first = false %}{% endif %}{% if locksmith_596f_forloop__index == locksmith_596f_forloop__size %}{% assign locksmith_596f_forloop__last = true %}{% else %}{% assign locksmith_596f_forloop__last = false %}{% endif %}{% assign locksmith_596f_forloop__rindex = locksmith_596f_forloop__size | minus: locksmith_596f_forloop__index | minus: 1 %}{% assign locksmith_596f_forloop__rindex0 = locksmith_596f_forloop__size | minus: locksmith_596f_forloop__index0 | minus: 1 %}{% else %}{% continue %}{% endif -%}
+{%- comment %}</locksmith:bfd8>{% endcomment -%}
+{% assign first_variant = product.selected_or_first_available_variant %}
+{
+"title":"{{ product.title | escape }}",
+"handle":"{{ product.handle }}",
+"id":"{{ product.id }}",
+"img":"{{ product | img_url: '100x100' }}",
+"original_price":"{{ first_variant.compare_at_price }}",
+"price":"{{ first_variant.price }}",
+"variant_title":"{{ first_variant.title | escape }}",
+"variant_id":"{{ first_variant.id }}",
+"inventory_quantity":"{{ first_variant.inventory_quantity }}",
+"inventory_policy":"{{ first_variant.inventory_policy }}",
+"inventory_management":"{{ first_variant.inventory_management }}",
+"available":{{ first_variant.available }},
+"variants":
+[
+{% for variant in product.variants %}
+{
+"original_price":"{{ variant.compare_at_price }}",
+"price":"{{ variant.price }}",
+"variant_title":"{{ variant.title | escape }}",
+"variant_id":"{{ variant.id }}",
+"inventory_quantity":"{{ variant.inventory_quantity }}",
+"inventory_policy":"{{ variant.inventory_policy }}",
+"inventory_management":"{{ variant.inventory_management }}",
+"available":{{ variant.available }}
+{% if variant.featured_image %}
+,
+"featured_image":"{{ variant.featured_image | img_url: "medium" }}"
+{% endif %}
+}
+{% if forloop.last != true %}
+,
+{% endif %}
+{% endfor %}
+]
+}
+{% if locksmith_596f_forloop__last != true %}
+,
+{% endif %}
+{% endfor %}
+]
+{% endif %}
